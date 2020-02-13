@@ -1,0 +1,5 @@
+- name: Terraform pre_build
+  include_tasks: pre_build.yml
+
+- name: Terraform build
+  include_tasks: build.yml

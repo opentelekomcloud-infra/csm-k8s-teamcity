@@ -1,0 +1,17 @@
+---
+all:
+  hosts:
+    local:
+      ansible_host: localhost
+      ansible_connection: local
+      ansible_python_interpreter: "/usr/bin/env python3"
+    teamcity:
+      ansible_ssh_user: "linux"
+      ansible_host: "ecs-{{ lookup('env', 'TC_SERVER_PUBLIC_IP') | replace('.','-')}}.reverse.open-telekom-cloud.com"
+    test_host:
+      ansible_ssh_user: "linux"
+      ansible_host: "ecs-{{ test_host_ip | replace('.','-')}}.reverse.open-telekom-cloud.com"
+  children:
+    team_city:
+      hosts:
+        teamcity:

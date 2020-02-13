@@ -1,0 +1,25 @@
+backend_config:
+  key: "terraform_state/{{ scenario_name }}"
+  endpoint: "obs.eu-de.otc.t-systems.com"
+  bucket: "obs-csm"
+  region: "eu-de"
+
+default_variables:
+  AWS_SECRET_ACCESS_KEY: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
+  AWS_ACCESS_KEY_ID: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
+  OS_USERNAME: "{{ lookup('env', 'OS_USERNAME') }}"
+  OS_PASSWORD: "{{ lookup('env', 'OS_PASSWORD') }}"
+  TF_VAR_cloud: "otc"
+  TF_VAR_region: "eu-de"
+  TF_VAR_availability_zone: "eu-de-03"
+  TF_VAR_ecs_flavor: "s2.medium.2"
+  TF_VAR_ecs_image: "Debian_10_latest"
+  TF_VAR_addr_3_octets: "192.168.0"
+  TF_VAR_domain_name: "OTC00000000001000000448"
+
+tf_variables:
+
+tmp_dir: '/tmp'
+key_name: null
+key_path: "{{ tmp_dir }}/{{ key_name }}"
+infrastructure_dir: "build_terraform_infra"

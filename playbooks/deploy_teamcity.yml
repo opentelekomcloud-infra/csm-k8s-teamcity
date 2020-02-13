@@ -1,0 +1,24 @@
+---
+- name: Prepare Infrastructure
+  hosts: test_host
+  become: yes
+  vars:
+    infrastructure_dir: "infrastructure"
+    scenario_name: "infrastracture"
+    tf_variables:
+      username: "{{ lookup('env', 'OS_USERNAME') }}"
+      password: "{{ lookup('env', 'OS_PASSWORD') }}"
+    default_variables:
+      AWS_SECRET_ACCESS_KEY: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
+      AWS_ACCESS_KEY_ID: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
+      OS_USERNAME: "{{ lookup('env', 'OS_USERNAME') }}"
+      OS_PASSWORD: "{{ lookup('env', 'OS_PASSWORD') }}"
+      TF_VAR_cloud: "otc"
+      TF_VAR_region: "eu-de"
+      TF_VAR_availability_zone: "eu-de-03"
+      TF_VAR_ecs_flavor: "s2.medium.2"
+      TF_VAR_ecs_image: "Debian_10_latest"
+      TF_VAR_addr_3_octets: "192.168.0"
+      TF_VAR_domain_name: "OTC00000000001000000447"
+  roles:
+    - role: build_terraform_infra

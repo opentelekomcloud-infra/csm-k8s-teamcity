@@ -1,0 +1,9 @@
+---
+- name: Build infrastructure
+  environment: "{{ default_variables }}"
+  terraform:
+    force_init: true
+    project_path: "{{ tmp_dir }}/infrastructure"
+    backend_config: "{{ backend_config }}"
+    variables: "{{ tf_variables }}"
+  register: tf_output
