@@ -1,10 +1,43 @@
 ---
+- name: Prepare host
+  hosts: localhost
+  become: yes
+  tasks:
+  - name: Install python3-venv
+    apt:
+      name: python3-venv
+      update_cache: yes
+
+  - name: Install ansible roles  # noqa 301 305
+    shell: "ansible-galaxy install --roles-path /etc/ansible/roles -r {{ home_dir }}/requirements.yml"
+
+  - name: create virtual environment
+    pip:
+      name: pip
+      virtualenv: "{{ home_dir }}/.venv"
+      virtualenv_command: "/usr/bin/python3 -m venv"
+
+  - name: Install test host python requirements
+    pip:
+      requirements: "{{ home_dir }}/requirements.txt"
+
+  - name: Copy Terraform infrastructure dir
+    copy:
+      src: "{{ infrastructure_dir }}"
+      dest: "{{ tmp_dir }}"
+
+- name: Ensure terraform installed
+  hosts: localhost
+  become: yes
+  roles:
+  - role: darkwizard242.terraform  # Make sure required version of terraform is installed
+
 - name: Prepare Infrastructure
-  hosts: test_host
+  hosts: localhost
   become: yes
   vars:
-    infrastructure_dir: "infrastructure"
-    scenario_name: "infrastracture"
+    scenario_name: "k8s_infrastructure"
+    key_name: "{{ scenario_name }}_rsa"
     tf_variables:
       username: "{{ lookup('env', 'OS_USERNAME') }}"
       password: "{{ lookup('env', 'OS_PASSWORD') }}"

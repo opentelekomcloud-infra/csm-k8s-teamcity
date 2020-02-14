@@ -22,4 +22,4 @@ tf_variables:
 tmp_dir: '/tmp'
 key_name: null
 key_path: "{{ tmp_dir }}/{{ key_name }}"
-infrastructure_dir: "build_terraform_infra"
+infrastructure_dir: "infrastructure"
