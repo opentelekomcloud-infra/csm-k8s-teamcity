@@ -32,7 +32,7 @@
   roles:
   - role: darkwizard242.terraform  # Make sure required version of terraform is installed
 
-- name: Prepare Infrastructure
+- name: Build Infrastructure
   hosts: localhost
   become: yes
   vars:
@@ -46,12 +46,16 @@
       AWS_ACCESS_KEY_ID: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
       OS_USERNAME: "{{ lookup('env', 'OS_USERNAME') }}"
       OS_PASSWORD: "{{ lookup('env', 'OS_PASSWORD') }}"
-      TF_VAR_cloud: "otc"
-      TF_VAR_region: "eu-de"
-      TF_VAR_availability_zone: "eu-de-03"
-      TF_VAR_ecs_flavor: "s2.medium.2"
-      TF_VAR_ecs_image: "Debian_10_latest"
-      TF_VAR_addr_3_octets: "192.168.0"
-      TF_VAR_domain_name: "OTC00000000001000000447"
+      TF_VAR_domain_name: "{{ lookup('env', 'TF_VAR_domain_name') }}"
+      TF_VAR_tenant_name: "{{ lookup('env', 'TF_VAR_tenant_name') }}"
   roles:
     - role: build_terraform_infra
+
+- name: Create inventory
+  hosts: localhost
+  become: yes
+  tasks:
+  - name: Run inventory script
+    script: terraform.py
+    args:
+      executable: 'python3'

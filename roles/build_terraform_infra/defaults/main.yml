@@ -15,7 +15,8 @@ default_variables:
   TF_VAR_ecs_flavor: "s2.medium.2"
   TF_VAR_ecs_image: "Debian_10_latest"
   TF_VAR_addr_3_octets: "192.168.0"
-  TF_VAR_domain_name: "OTC00000000001000000448"
+  TF_VAR_domain_name: "OTC00000000001000000447"
+  TF_VAR_tenant_name: "eu-de_rus"
 
 tf_variables:
 

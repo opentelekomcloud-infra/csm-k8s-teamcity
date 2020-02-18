@@ -1,0 +1,28 @@
+---
+- name: Destroy everithing
+  hosts: local
+  become: yes
+  vars:
+    tf_variables:
+      username: "{{ lookup('env', 'OS_USERNAME') }}"
+      password: "{{ lookup('env', 'OS_PASSWORD') }}"
+    default_variables:
+      AWS_SECRET_ACCESS_KEY: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
+      AWS_ACCESS_KEY_ID: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
+      OS_USERNAME: "{{ lookup('env', 'OS_USERNAME') }}"
+      OS_PASSWORD: "{{ lookup('env', 'OS_PASSWORD') }}"
+      TF_VAR_domain_name: "{{ lookup('env', 'TF_VAR_domain_name') }}"
+      TF_VAR_tenant_name: "{{ lookup('env', 'TF_VAR_tenant_name') }}"
+  tasks:
+  - name: Destroy infrastructure
+    environment: "{{ default_variables }}"
+    terraform:
+      state: absent
+      force_init: true
+      project_path: "{{ tmp_dir }}/{{ infrastructure_dir }}"
+      variables: "{{ tf_variables }}"
+
+  - name:  Remove terraform directory
+    file: path='/tmp/{{ item }}' state=absent
+    with_fileglob:
+      - /tmp/*
