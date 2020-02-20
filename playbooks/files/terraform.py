@@ -458,8 +458,8 @@ def main():
     elif args.hostfile:
         output = query_hostfile(hosts)
         print(output)
-    out_path = args.root + '/inventory/prod/hosts'
-    with open(out_path, 'w+') as file:
+    out_path = os.path.dirname(os.getcwd())
+    with open(f"{out_path}/inventory/prod/hosts", 'w+') as file:
         file.write(output)
     print(f'File written to: {out_path}')
     parser.exit()

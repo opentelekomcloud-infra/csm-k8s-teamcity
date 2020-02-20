@@ -1,0 +1,9 @@
+---
+- name: Create inventory
+  hosts: localhost
+  become: yes
+  tasks:
+  - name: Run inventory script
+    script: "{{ home_dir }}/playbooks/files/terraform.py --hostfile"
+    args:
+      executable: 'python3'

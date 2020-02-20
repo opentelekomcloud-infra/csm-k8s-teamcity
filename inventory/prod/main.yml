@@ -5,13 +5,26 @@ all:
       ansible_host: localhost
       ansible_connection: local
       ansible_python_interpreter: "/usr/bin/env python3"
-    teamcity:
+    bastion:
       ansible_ssh_user: "linux"
-      ansible_host: "ecs-{{ lookup('env', 'TC_SERVER_PUBLIC_IP') | replace('.','-')}}.reverse.open-telekom-cloud.com"
-    test_host:
+      ansible_host: 80.158.43.15
+    csm_k8s-master-1:
       ansible_ssh_user: "linux"
-      ansible_host: "ecs-{{ test_host_ip | replace('.','-')}}.reverse.open-telekom-cloud.com"
+      ansible_host: 80.158.4.229
+    csm_k8s-node-nf-1:
+      ansible_ssh_user: "linux"
+      ansible_host: 192.168.0.218
+    csm_k8s-node-nf-2:
+      ansible_ssh_user: "linux"
+      ansible_host: 192.168.0.52
   children:
-    team_city:
+    kube-node:
       hosts:
-        teamcity:
+        csm_k8s-node-nf-1:
+        csm_k8s-node-nf-2:
+    kube-master:
+      hosts:
+        csm_k8s-master-1:
+    bastion:
+      hosts:
+        bastion:

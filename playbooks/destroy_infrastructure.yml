@@ -23,6 +23,6 @@
       variables: "{{ tf_variables }}"
 
   - name:  Remove terraform directory
-    file: path='/tmp/{{ item }}' state=absent
-    with_fileglob:
-      - /tmp/*
+    file:
+      state: absent
+      path: "/tmp/*"
