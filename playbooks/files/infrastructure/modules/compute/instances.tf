@@ -3,10 +3,6 @@ data "opentelekomcloud_images_image_v2" "vm_image" {
   most_recent = true
 }
 
-data "opentelekomcloud_images_image_v2" "gfs_image" {
-  name = var.ecs_image_gfs == "" ? var.ecs_image : var.ecs_image_gfs
-}
-
 resource "opentelekomcloud_compute_keypair_v2" "k8s" {
   name       = var.key_name
   public_key = var.public_key
@@ -15,6 +11,7 @@ resource "opentelekomcloud_compute_keypair_v2" "k8s" {
 resource "opentelekomcloud_compute_instance_v2" "bastion" {
   name       = "${var.cluster_name}-bastion-${count.index+1}"
   count      = var.bastion_root_volume_size_in_gb > 0 ? var.number_of_bastions : 0
+  availability_zone = var.availability_zone
   image_name = var.ecs_image
   flavor_id  = var.ecs_flavor
   key_pair   = opentelekomcloud_compute_keypair_v2.k8s.name
@@ -45,7 +42,7 @@ resource "opentelekomcloud_compute_instance_v2" "bastion" {
   }
 
   provisioner "local-exec" {
-    command = "sed s/USER/${var.ssh_user}/ ../../playbooks/files/infrastructure/bastion_template.txt | sed s/BASTION_ADDRESS/${var.bastion_fips[0]}/ > group_vars/no-floating.yml"
+    command = "sed s/USER/${var.ssh_user}/ ./bastion_template.txt | sed s/BASTION_ADDRESS/${var.bastion_fips[0]}/ > no-floating.yml"
   }
 }
 
@@ -90,7 +87,7 @@ resource "opentelekomcloud_compute_instance_v2" "k8s_master" {
   }
 
   provisioner "local-exec" {
-    command = "sed s/USER/${var.ssh_user}/ ../../playbooks/files/infrastructure/bastion_template.txt | sed s/BASTION_ADDRESS/${element( concat(var.bastion_fips, var.k8s_master_fips), 0)}/ > group_vars/no-floating.yml"
+    command = "sed s/USER/${var.ssh_user}/ ./bastion_template.txt | sed s/BASTION_ADDRESS/${element( concat(var.bastion_fips, var.k8s_master_fips), 0)}/ > no-floating.yml"
   }
 }
 
@@ -215,7 +212,7 @@ resource "opentelekomcloud_compute_instance_v2" "k8s_node" {
   }
 
   provisioner "local-exec" {
-    command = "sed s/USER/${var.ssh_user}/ ../../playbooks/files/infrastructure/bastion_template.txt | sed s/BASTION_ADDRESS/${element( concat(var.bastion_fips, var.k8s_node_fips), 0)}/ > group_vars/no-floating.yml"
+    command = "sed s/USER/${var.ssh_user}/ ./infrastructure/bastion_template.txt | sed s/BASTION_ADDRESS/${element( concat(var.bastion_fips, var.k8s_node_fips), 0)}/ > no-floating.yml"
   }
 }
 
@@ -223,19 +220,16 @@ resource "opentelekomcloud_compute_floatingip_associate_v2" "bastion" {
   count                 = var.bastion_root_volume_size_in_gb > 0 ? var.number_of_bastions : 0
   floating_ip           = var.bastion_fips[count.index]
   instance_id           = element(opentelekomcloud_compute_instance_v2.bastion.*.id, count.index)
-  wait_until_associated = var.wait_for_floatingip
 }
 
 resource "opentelekomcloud_compute_floatingip_associate_v2" "k8s_master" {
   count                 = var.master_root_volume_size_in_gb > 0 ? var.number_of_k8s_masters : 0
   instance_id           = element(opentelekomcloud_compute_instance_v2.k8s_master.*.id, count.index)
   floating_ip           = var.k8s_master_fips[count.index]
-  wait_until_associated = var.wait_for_floatingip
 }
 
 resource "opentelekomcloud_compute_floatingip_associate_v2" "k8s_node" {
   count                 = var.node_root_volume_size_in_gb == 0 ? var.number_of_k8s_nodes : 0
   floating_ip           = var.k8s_node_fips[count.index]
   instance_id           = element(opentelekomcloud_compute_instance_v2.k8s_node.*.id, count.index)
-  wait_until_associated = var.wait_for_floatingip
 }

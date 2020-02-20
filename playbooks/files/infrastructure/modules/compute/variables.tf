@@ -44,8 +44,6 @@ variable "k8s_node_fips" {}
 
 variable "k8s_master_fips" {}
 
-variable "wait_for_floatingip" {}
-
 variable "bastion_root_volume_size_in_gb" {
   default = 5
 }

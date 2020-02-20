@@ -21,12 +21,12 @@ Dynamic inventory for Terraform - finds all `.tfstate` files below the working
 directory and generates an inventory based on them.
 """
 import argparse
-from collections import defaultdict
-import random
-from functools import wraps
 import json
 import os
+import random
 import re
+from collections import defaultdict
+from functools import wraps
 
 VERSION = '0.4.0pre'
 
@@ -38,13 +38,14 @@ def tfstates(root=None):
             if os.path.splitext(name)[-1] == '.tfstate':
                 yield os.path.join(dirpath, name)
 
+
 def convert_to_v3_structure(attributes, prefix=''):
     """ Convert the attributes from v4 to v3
     Receives a dict and return a dictionary """
     result = {}
     if isinstance(attributes, str):
         # In the case when we receive a string (e.g. values for security_groups)
-        return {'{}{}'.format(prefix, random.randint(1,10**10)): attributes}
+        return {'{}{}'.format(prefix, random.randint(1, 10 ** 10)): attributes}
     for key, value in attributes.items():
         if isinstance(value, list):
             if len(value):
@@ -58,6 +59,7 @@ def convert_to_v3_structure(attributes, prefix=''):
         else:
             result['{}{}'.format(prefix, key)] = value
     return result
+
 
 def iterresources(filenames):
     for filename in filenames:
@@ -77,15 +79,15 @@ def iterresources(filenames):
                     for instance in resource['instances']:
                         key = "{}.{}".format(resource['type'], resource['name'])
                         if 'index_key' in instance:
-                           key = "{}.{}".format(key, instance['index_key'])
+                            key = "{}.{}".format(key, instance['index_key'])
                         data = {}
                         data['type'] = resource['type']
                         data['provider'] = resource['provider']
                         data['depends_on'] = instance.get('depends_on', [])
                         data['primary'] = {'attributes': convert_to_v3_structure(instance['attributes'])}
                         if 'id' in instance['attributes']:
-                           data['primary']['id'] = instance['attributes']['id']
-                        data['primary']['meta'] = instance['attributes'].get('meta',{})
+                            data['primary']['id'] = instance['attributes']['id']
+                        data['primary']['meta'] = instance['attributes'].get('meta', {})
                         yield name, key, data
             else:
                 raise KeyError('tfstate version %d not supported' % tf_version)
@@ -117,8 +119,8 @@ def iterips(resources):
     '''yield ip tuples of (instance_id, ip)'''
     for module_name, key, resource in resources:
         resource_type, name = key.split('.', 1)
-        if resource_type == 'openstack_compute_floatingip_associate_v2':
-            yield openstack_floating_ips(resource)
+        if resource_type == 'opentelekomcloud_compute_floatingip_associate_v2':
+            yield opentelekomcloud_floating_ips(resource)
 
 
 def parses(prefix):
@@ -239,7 +241,7 @@ def packet_device(resource, tfvars=None):
     return name, attrs, groups
 
 
-def openstack_floating_ips(resource):
+def opentelekomcloud_floating_ips(resource):
     raw_attrs = resource['primary']['attributes']
     attrs = {
         'ip': raw_attrs['floating_ip'],
@@ -247,13 +249,15 @@ def openstack_floating_ips(resource):
     }
     return attrs
 
-def openstack_floating_ips(resource):
+
+def opentelekomcloud_floating_ips(resource):
     raw_attrs = resource['primary']['attributes']
     return raw_attrs['instance_id'], raw_attrs['floating_ip']
 
-@parses('openstack_compute_instance_v2')
+
+@parses('opentelekomcloud_compute_instance_v2')
 @calculate_mantl_vars
-def openstack_host(resource, module_name):
+def opentelekomcloud_host(resource, module_name):
     raw_attrs = resource['primary']['attributes']
     name = raw_attrs['name']
     groups = []
@@ -275,14 +279,14 @@ def openstack_host(resource, module_name):
         'security_groups': parse_list(raw_attrs, 'security_groups'),
         # ansible
         'ansible_ssh_port': 22,
-        # workaround for an OpenStack bug where hosts have a different domain
+        # workaround for an opentelekomcloud bug where hosts have a different domain
         # after they're restarted
         'host_domain': 'novalocal',
         'use_host_domain': True,
         # generic
         'public_ipv4': raw_attrs['access_ip_v4'],
         'private_ipv4': raw_attrs['access_ip_v4'],
-        'provider': 'openstack',
+        'provider': 'opentelekomcloud',
     }
 
     if 'floating_ip' in raw_attrs:
@@ -302,7 +306,7 @@ def openstack_host(resource, module_name):
     except (KeyError, ValueError):
         attrs.update({'ansible_ssh_host': '', 'publicly_routable': False})
 
-    # Handling of floating IPs has changed: https://github.com/terraform-providers/terraform-provider-openstack/blob/master/CHANGELOG.md#010-june-21-2017
+    # Handling of floating IPs has changed: https://github.com/terraform-providers/terraform-provider-opentelekomcloud/blob/master/CHANGELOG.md#010-june-21-2017
 
     # attrs specific to Ansible
     if 'metadata.ssh_user' in raw_attrs:
@@ -313,15 +317,14 @@ def openstack_host(resource, module_name):
         for key, value in list(raw_attrs.items()):
             match = re.search("^volume.*.device$", key)
             if match:
-                attrs['disk_volume_device_'+str(device_index)] = value
+                attrs['disk_volume_device_' + str(device_index)] = value
                 device_index += 1
-
 
     # attrs specific to Mantl
     attrs.update({
         'consul_dc': _clean_dc(attrs['metadata'].get('dc', module_name)),
         'role': attrs['metadata'].get('role', 'none'),
-        'ansible_python_interpreter': attrs['metadata'].get('python_bin','python')
+        'ansible_python_interpreter': attrs['metadata'].get('python_bin', 'python')
     })
 
     # add groups based on attrs
@@ -358,7 +361,7 @@ def iter_host_ips(hosts, ips):
             })
 
         if 'use_access_ip' in host[1]['metadata'] and host[1]['metadata']['use_access_ip'] == "0":
-                host[1].pop('access_ip')
+            host[1].pop('access_ip')
 
         yield host
 
@@ -455,7 +458,10 @@ def main():
     elif args.hostfile:
         output = query_hostfile(hosts)
         print(output)
-
+    out_path = args.root + '/inventory/prod/hosts'
+    with open(out_path, 'w+') as file:
+        file.write(output)
+    print(f'File written to: {out_path}')
     parser.exit()
 
 

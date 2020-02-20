@@ -8,54 +8,64 @@
       name: python3-venv
       update_cache: yes
 
-  - name: Install ansible roles  # noqa 301 305
-    shell: "ansible-galaxy install --roles-path /etc/ansible/roles -r {{ home_dir }}/requirements.yml"
-
-  - name: create virtual environment
-    pip:
-      name: pip
-      virtualenv: "{{ home_dir }}/.venv"
-      virtualenv_command: "/usr/bin/python3 -m venv"
-
-  - name: Install test host python requirements
-    pip:
-      requirements: "{{ home_dir }}/requirements.txt"
-
-  - name: Copy Terraform infrastructure dir
-    copy:
-      src: "{{ infrastructure_dir }}"
-      dest: "{{ tmp_dir }}"
-
-- name: Ensure terraform installed
-  hosts: localhost
-  become: yes
-  roles:
-  - role: darkwizard242.terraform  # Make sure required version of terraform is installed
-
-- name: Build Infrastructure
-  hosts: localhost
-  become: yes
-  vars:
-    scenario_name: "k8s_infrastructure"
-    key_name: "{{ scenario_name }}_rsa"
-    tf_variables:
-      username: "{{ lookup('env', 'OS_USERNAME') }}"
-      password: "{{ lookup('env', 'OS_PASSWORD') }}"
-    default_variables:
-      AWS_SECRET_ACCESS_KEY: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
-      AWS_ACCESS_KEY_ID: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
-      OS_USERNAME: "{{ lookup('env', 'OS_USERNAME') }}"
-      OS_PASSWORD: "{{ lookup('env', 'OS_PASSWORD') }}"
-      TF_VAR_domain_name: "{{ lookup('env', 'TF_VAR_domain_name') }}"
-      TF_VAR_tenant_name: "{{ lookup('env', 'TF_VAR_tenant_name') }}"
-  roles:
-    - role: build_terraform_infra
+#  - name: Install ansible roles  # noqa 301 305
+#    shell: "ansible-galaxy install --roles-path /etc/ansible/roles -r {{ home_dir }}/requirements.yml"
+#
+#  - name: create virtual environment
+#    pip:
+#      name: pip
+#      virtualenv: "{{ home_dir }}/.venv"
+#      virtualenv_command: "/usr/bin/python3 -m venv"
+#
+#  - name: Install test host python requirements
+#    pip:
+#      requirements: "{{ home_dir }}/requirements.txt"
+#
+#  - name: Copy Terraform infrastructure dir
+#    copy:
+#      src: "{{ infrastructure_dir }}"
+#      dest: "{{ tmp_dir }}"
+#
+#- name: Ensure terraform installed
+#  hosts: localhost
+#  become: yes
+#  roles:
+#  - role: darkwizard242.terraform  # Make sure required version of terraform is installed
+#
+#- name: Build Infrastructure
+#  hosts: localhost
+#  become: yes
+#  vars:
+#    scenario_name: "k8s_infrastructure"
+#    key_name: "{{ scenario_name }}_rsa"
+#    tf_variables:
+#      username: "{{ lookup('env', 'OS_USERNAME') }}"
+#      password: "{{ lookup('env', 'OS_PASSWORD') }}"
+#    default_variables:
+#      AWS_SECRET_ACCESS_KEY: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
+#      AWS_ACCESS_KEY_ID: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
+#      OS_USERNAME: "{{ lookup('env', 'OS_USERNAME') }}"
+#      OS_PASSWORD: "{{ lookup('env', 'OS_PASSWORD') }}"
+#      TF_VAR_domain_name: "{{ lookup('env', 'TF_VAR_domain_name') }}"
+#      TF_VAR_tenant_name: "{{ lookup('env', 'TF_VAR_tenant_name') }}"
+#  roles:
+#    - role: build_terraform_infra
 
 - name: Create inventory
   hosts: localhost
   become: yes
   tasks:
+  - name: Copy no-floating
+    copy:
+      src: "{{ tmp_dir }}/{{ infrastructure_dir }}/no-floating.yml"
+      dest: "{{ home_dir }}/inventory/prod/group_vars/"
+
+  - name: Copy state
+    copy:
+      src: "{{ tmp_dir }}/{{ infrastructure_dir }}/terraform.tfstate"
+      dest: "{{ home_dir }}/playbooks/files"
+
   - name: Run inventory script
-    script: terraform.py
+    script: "{{ home_dir }}/playbooks/files/terraform.py --hostfile"
     args:
       executable: 'python3'

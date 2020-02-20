@@ -48,49 +48,34 @@ variable "number_of_etcd" {}
 # masters
 variable "number_of_k8s_masters" {}
 
-variable "number_of_k8s_masters_no_etcd" {}
-
-variable "number_of_k8s_masters_no_floating_ip" {}
-
-variable "number_of_k8s_masters_no_floating_ip_no_etcd" {}
-
-variable "flavor_k8s_master" {}
-
 # nodes
 variable "number_of_k8s_nodes" {}
 
 variable "number_of_k8s_nodes_no_floating_ip" {}
 
 # networking
-variable "external_net" {}
 
 variable "bastion_allowed_remote_ips" {
   description = "An array of CIDRs allowed to SSH to hosts"
-  type        = "list"
   default     = ["0.0.0.0/0"]
 }
 
 variable "master_allowed_remote_ips" {
   description = "An array of CIDRs allowed to access API of masters"
-  type        = "list"
   default     = ["0.0.0.0/0"]
 }
 
 variable "k8s_allowed_remote_ips" {
   description = "An array of CIDRs allowed to SSH to hosts"
-  type        = "list"
   default     = []
 }
 
 variable "k8s_allowed_egress_ips" {
   description = "An array of CIDRs allowed for egress traffic"
-  type        = "list"
   default     = ["0.0.0.0/0"]
 }
 
 variable "worker_allowed_ports" {
-  type = "list"
-
   default = [
     {
       protocol         = "tcp"
@@ -111,12 +96,7 @@ variable "use_server_groups" {
 
 variable "floatingip_pool" {
   description = "name of the floating ip pool to use"
-  default     = "external"
-}
-
-variable "wait_for_floatingip" {
-  description = "Terraform will poll the instance until the floating IP has been associated."
-  default     = "false"
+  default     = "admin_external_net"
 }
 
 variable "network_name" {

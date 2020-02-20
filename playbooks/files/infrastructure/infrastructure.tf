@@ -10,11 +10,9 @@ module "ips" {
   source = "./modules/ips"
 
   number_of_k8s_masters         = var.number_of_k8s_masters
-  number_of_k8s_masters_no_etcd = var.number_of_k8s_masters_no_etcd
   number_of_k8s_nodes           = var.number_of_k8s_nodes
   floatingip_pool               = var.floatingip_pool
   number_of_bastions            = var.number_of_bastions
-  external_net                  = var.external_net
   router_id                     = module.network.router_id
 }
 
@@ -35,7 +33,6 @@ module "compute" {
   use_access_ip                      = var.use_access_ip
   bastion_fips                       = module.ips.bastion_fips
   k8s_node_fips                      = module.ips.k8s_node_fips
-  k8s_master_no_etcd_fips            = module.ips.k8s_master_no_etcd_fips
   k8s_master_fips                    = module.ips.k8s_master_fips
   network_id                         = module.network.router_id
   network_name                       = var.network_name
@@ -45,7 +42,6 @@ module "compute" {
   number_of_k8s_masters              = var.number_of_k8s_masters
   number_of_k8s_nodes                = var.number_of_k8s_nodes
   number_of_k8s_nodes_no_floating_ip = var.number_of_k8s_nodes_no_floating_ip
-  wait_for_floatingip                = var.wait_for_floatingip
 }
 
 //module "postgresql" {
@@ -73,3 +69,27 @@ module "compute" {
 //output "out-db_address" {
 //  value = module.postgresql.db_address
 //}
+
+output "private_subnet_id" {
+  value = module.network.subnet_id
+}
+
+output "floating_network_id" {
+  value = module.network.external_network.id
+}
+
+output "router_id" {
+  value = module.network.router_id
+}
+
+output "k8s_master_fips" {
+  value = module.ips.k8s_master_fips
+}
+
+output "k8s_node_fips" {
+  value = module.ips.k8s_node_fips
+}
+
+output "bastion_fips" {
+  value = module.ips.bastion_fips
+}
