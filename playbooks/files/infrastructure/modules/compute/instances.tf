@@ -15,6 +15,7 @@ resource "opentelekomcloud_compute_instance_v2" "bastion" {
   image_name = var.ecs_image
   flavor_id  = var.ecs_flavor
   key_pair   = opentelekomcloud_compute_keypair_v2.k8s.name
+  user_data  = file("${path.module}/first_boot.sh")
 
   block_device {
     uuid                  = data.opentelekomcloud_images_image_v2.vm_image.id
@@ -53,6 +54,7 @@ resource "opentelekomcloud_compute_instance_v2" "k8s_master" {
   image_name        = var.ecs_image
   flavor_id         = var.ecs_flavor
   key_pair          = opentelekomcloud_compute_keypair_v2.k8s.name
+  user_data  = file("${path.module}/first_boot.sh")
 
   block_device {
     uuid                  = data.opentelekomcloud_images_image_v2.vm_image.id
@@ -98,6 +100,7 @@ resource "opentelekomcloud_compute_instance_v2" "k8s_node_no_floating_ip" {
   image_name        = var.ecs_image
   flavor_id         = var.ecs_flavor
   key_pair          = opentelekomcloud_compute_keypair_v2.k8s.name
+  user_data  = file("${path.module}/first_boot.sh")
 
   block_device {
     uuid                  = data.opentelekomcloud_images_image_v2.vm_image.id
@@ -139,6 +142,7 @@ resource "opentelekomcloud_compute_instance_v2" "etcd" {
   image_name        = var.ecs_image
   flavor_id         = var.ecs_flavor
   key_pair          = opentelekomcloud_compute_keypair_v2.k8s.name
+  user_data  = file("${path.module}/first_boot.sh")
 
   block_device {
     uuid                  = data.opentelekomcloud_images_image_v2.vm_image.id
@@ -178,6 +182,7 @@ resource "opentelekomcloud_compute_instance_v2" "k8s_node" {
   image_name        = var.ecs_image
   flavor_id         = var.ecs_flavor
   key_pair          = opentelekomcloud_compute_keypair_v2.k8s.name
+  user_data  = file("${path.module}/first_boot.sh")
 
   block_device {
     uuid                  = data.opentelekomcloud_images_image_v2.vm_image.id

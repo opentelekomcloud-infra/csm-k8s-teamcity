@@ -36,8 +36,6 @@
   hosts: localhost
   become: yes
   vars:
-    scenario_name: "k8s_infrastructure"
-    key_name: "{{ scenario_name }}_rsa"
     tf_variables:
       username: "{{ lookup('env', 'OS_USERNAME') }}"
       password: "{{ lookup('env', 'OS_PASSWORD') }}"

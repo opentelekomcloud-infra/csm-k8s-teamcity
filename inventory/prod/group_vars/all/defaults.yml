@@ -1,8 +1,10 @@
 test_host_ip: ''
 home_dir: '/windir/c/Users/ansideln/PycharmProjects/csm-team-city'
 infrastructure_dir: 'infrastructure'
+scenario_name: "k8s_infrastructure"
+key_name: "{{ scenario_name }}_rsa"
 terraform_version: 0.12.20
 tmp_dir: '/tmp'
 key_path: '{{ tmp_dir }}/{{ key_name }}'
 ansible_user: 'linux'
-ansible_ssh_private_key_file: {{ key_path }}
+ansible_ssh_private_key_file: '{{ key_path }}'

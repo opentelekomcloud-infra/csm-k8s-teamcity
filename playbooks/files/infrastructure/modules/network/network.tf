@@ -6,7 +6,8 @@ resource "opentelekomcloud_networking_router_v2" "k8s" {
   name                = "${var.cluster_name}-router"
   count               = var.use_neutron
   admin_state_up      = "true"
-  external_gateway = data.opentelekomcloud_networking_network_v2.extnet.id
+  enable_snat         = true
+  external_gateway    = data.opentelekomcloud_networking_network_v2.extnet.id
 }
 
 resource "opentelekomcloud_networking_network_v2" "k8s" {
