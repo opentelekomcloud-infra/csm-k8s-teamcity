@@ -26,10 +26,15 @@ all:
             node2:
         kube-master:
           hosts:
-            master:
+            master1:
         etcd:
           hosts:
-            master:
+            master1:
     bastion:
       hosts:
-        bastion:
+        bastion1:
+    no-floating:
+      hosts:
+        node1:
+        node2:
+        master1:
