@@ -46,6 +46,7 @@
       OS_PASSWORD: "{{ lookup('env', 'OS_PASSWORD') }}"
       TF_VAR_domain_name: "{{ lookup('env', 'TF_VAR_domain_name') }}"
       TF_VAR_tenant_name: "{{ lookup('env', 'TF_VAR_tenant_name') }}"
+      TF_VAR_public_key: "{{ lookup('file', '{{ tmp_dir }}/{{ scenario_name }}_rsa.pub') }}"
   roles:
     - role: build_terraform_infra
 

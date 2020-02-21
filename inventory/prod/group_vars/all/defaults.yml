@@ -1,5 +1,6 @@
 test_host_ip: ''
 home_dir: '/windir/c/Users/ansideln/PycharmProjects/csm-team-city'
+#home_dir: '/home/ansideln/work/csm-team-city'
 infrastructure_dir: 'infrastructure'
 scenario_name: "k8s_infrastructure"
 key_name: "{{ scenario_name }}_rsa"

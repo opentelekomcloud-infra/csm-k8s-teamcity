@@ -9,11 +9,11 @@ module "network" {
 module "ips" {
   source = "./modules/ips"
 
-  number_of_k8s_masters         = var.number_of_k8s_masters
-  number_of_k8s_nodes           = var.number_of_k8s_nodes
-  floatingip_pool               = var.floatingip_pool
-  number_of_bastions            = var.number_of_bastions
-  router_id                     = module.network.router_id
+  number_of_k8s_masters = var.number_of_k8s_masters
+  number_of_k8s_nodes   = var.number_of_k8s_nodes
+  floatingip_pool       = var.floatingip_pool
+  number_of_bastions    = var.number_of_bastions
+  router_id             = module.network.router_id
 }
 
 module "compute" {

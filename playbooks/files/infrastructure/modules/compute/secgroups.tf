@@ -83,19 +83,19 @@ resource "opentelekomcloud_networking_secgroup_rule_v2" "worker" {
 }
 
 resource "opentelekomcloud_compute_servergroup_v2" "k8s_master" {
-  count = "%{ if var.use_server_groups }1%{else}0%{endif}"
-  name = "k8s-master-srvgrp"
+  count    = "%{if var.use_server_groups}1%{else}0%{endif}"
+  name     = "k8s-master-srvgrp"
   policies = ["anti-affinity"]
 }
 
 resource "opentelekomcloud_compute_servergroup_v2" "k8s_node" {
-  count = "%{ if var.use_server_groups }1%{else}0%{endif}"
-  name = "k8s-node-srvgrp"
+  count    = "%{if var.use_server_groups}1%{else}0%{endif}"
+  name     = "k8s-node-srvgrp"
   policies = ["anti-affinity"]
 }
 
 resource "opentelekomcloud_compute_servergroup_v2" "k8s_etcd" {
-  count = "%{ if var.use_server_groups }1%{else}0%{endif}"
-  name = "k8s-etcd-srvgrp"
+  count    = "%{if var.use_server_groups}1%{else}0%{endif}"
+  name     = "k8s-etcd-srvgrp"
   policies = ["anti-affinity"]
 }

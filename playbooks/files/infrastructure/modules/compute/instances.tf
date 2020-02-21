@@ -1,5 +1,5 @@
 data "opentelekomcloud_images_image_v2" "vm_image" {
-  name = var.ecs_image
+  name        = var.ecs_image
   most_recent = true
 }
 
@@ -9,13 +9,13 @@ resource "opentelekomcloud_compute_keypair_v2" "k8s" {
 }
 
 resource "opentelekomcloud_compute_instance_v2" "bastion" {
-  name       = "${var.cluster_name}-bastion-${count.index+1}"
-  count      = var.bastion_root_volume_size_in_gb > 0 ? var.number_of_bastions : 0
+  name              = "${var.cluster_name}-bastion-${count.index + 1}"
+  count             = var.bastion_root_volume_size_in_gb > 0 ? var.number_of_bastions : 0
   availability_zone = var.availability_zone
-  image_name = var.ecs_image
-  flavor_id  = var.ecs_flavor
-  key_pair   = opentelekomcloud_compute_keypair_v2.k8s.name
-  user_data  = file("${path.module}/first_boot.sh")
+  image_name        = var.ecs_image
+  flavor_id         = var.ecs_flavor
+  key_pair          = opentelekomcloud_compute_keypair_v2.k8s.name
+  user_data         = file("${path.module}/first_boot.sh")
 
   block_device {
     uuid                  = data.opentelekomcloud_images_image_v2.vm_image.id
@@ -48,13 +48,13 @@ resource "opentelekomcloud_compute_instance_v2" "bastion" {
 }
 
 resource "opentelekomcloud_compute_instance_v2" "k8s_master" {
-  name              = "${var.cluster_name}-master-${count.index+1}"
+  name              = "${var.cluster_name}-master-${count.index + 1}"
   count             = var.master_root_volume_size_in_gb > 0 ? var.number_of_k8s_masters : 0
   availability_zone = var.availability_zone
   image_name        = var.ecs_image
   flavor_id         = var.ecs_flavor
   key_pair          = opentelekomcloud_compute_keypair_v2.k8s.name
-  user_data  = file("${path.module}/first_boot.sh")
+  user_data         = file("${path.module}/first_boot.sh")
 
   block_device {
     uuid                  = data.opentelekomcloud_images_image_v2.vm_image.id
@@ -89,18 +89,18 @@ resource "opentelekomcloud_compute_instance_v2" "k8s_master" {
   }
 
   provisioner "local-exec" {
-    command = "sed s/USER/${var.ssh_user}/ ./bastion_template.txt | sed s/BASTION_ADDRESS/${element( concat(var.bastion_fips, var.k8s_master_fips), 0)}/ > no-floating.yml"
+    command = "sed s/USER/${var.ssh_user}/ ./bastion_template.txt | sed s/BASTION_ADDRESS/${element(concat(var.bastion_fips, var.k8s_master_fips), 0)}/ > no-floating.yml"
   }
 }
 
 resource "opentelekomcloud_compute_instance_v2" "k8s_node_no_floating_ip" {
-  name              = "${var.cluster_name}-node-nf-${count.index+1}"
+  name              = "${var.cluster_name}-node-nf-${count.index + 1}"
   count             = var.node_root_volume_size_in_gb > 0 ? var.number_of_k8s_nodes_no_floating_ip : 0
   availability_zone = var.availability_zone
   image_name        = var.ecs_image
   flavor_id         = var.ecs_flavor
   key_pair          = opentelekomcloud_compute_keypair_v2.k8s.name
-  user_data  = file("${path.module}/first_boot.sh")
+  user_data         = file("${path.module}/first_boot.sh")
 
   block_device {
     uuid                  = data.opentelekomcloud_images_image_v2.vm_image.id
@@ -136,13 +136,13 @@ resource "opentelekomcloud_compute_instance_v2" "k8s_node_no_floating_ip" {
 }
 
 resource "opentelekomcloud_compute_instance_v2" "etcd" {
-  name              = "${var.cluster_name}-etcd-${count.index+1}"
+  name              = "${var.cluster_name}-etcd-${count.index + 1}"
   count             = var.etcd_root_volume_size_in_gb > 0 ? var.number_of_etcd : 0
   availability_zone = var.availability_zone
   image_name        = var.ecs_image
   flavor_id         = var.ecs_flavor
   key_pair          = opentelekomcloud_compute_keypair_v2.k8s.name
-  user_data  = file("${path.module}/first_boot.sh")
+  user_data         = file("${path.module}/first_boot.sh")
 
   block_device {
     uuid                  = data.opentelekomcloud_images_image_v2.vm_image.id
@@ -158,7 +158,7 @@ resource "opentelekomcloud_compute_instance_v2" "etcd" {
   }
 
   security_groups = [
-    opentelekomcloud_networking_secgroup_v2.k8s.name]
+  opentelekomcloud_networking_secgroup_v2.k8s.name]
 
   dynamic "scheduler_hints" {
     for_each = var.use_server_groups ? [opentelekomcloud_compute_servergroup_v2.k8s_etcd[0]] : []
@@ -176,13 +176,13 @@ resource "opentelekomcloud_compute_instance_v2" "etcd" {
 }
 
 resource "opentelekomcloud_compute_instance_v2" "k8s_node" {
-  name              = "${var.cluster_name}-node-${count.index+1}"
+  name              = "${var.cluster_name}-node-${count.index + 1}"
   count             = var.node_root_volume_size_in_gb > 0 ? var.number_of_k8s_nodes : 0
   availability_zone = var.availability_zone
   image_name        = var.ecs_image
   flavor_id         = var.ecs_flavor
   key_pair          = opentelekomcloud_compute_keypair_v2.k8s.name
-  user_data  = file("${path.module}/first_boot.sh")
+  user_data         = file("${path.module}/first_boot.sh")
 
   block_device {
     uuid                  = data.opentelekomcloud_images_image_v2.vm_image.id
@@ -217,24 +217,24 @@ resource "opentelekomcloud_compute_instance_v2" "k8s_node" {
   }
 
   provisioner "local-exec" {
-    command = "sed s/USER/${var.ssh_user}/ ./infrastructure/bastion_template.txt | sed s/BASTION_ADDRESS/${element( concat(var.bastion_fips, var.k8s_node_fips), 0)}/ > no-floating.yml"
+    command = "sed s/USER/${var.ssh_user}/ ./infrastructure/bastion_template.txt | sed s/BASTION_ADDRESS/${element(concat(var.bastion_fips, var.k8s_node_fips), 0)}/ > no-floating.yml"
   }
 }
 
 resource "opentelekomcloud_compute_floatingip_associate_v2" "bastion" {
-  count                 = var.bastion_root_volume_size_in_gb > 0 ? var.number_of_bastions : 0
-  floating_ip           = var.bastion_fips[count.index]
-  instance_id           = element(opentelekomcloud_compute_instance_v2.bastion.*.id, count.index)
+  count       = var.bastion_root_volume_size_in_gb > 0 ? var.number_of_bastions : 0
+  floating_ip = var.bastion_fips[count.index]
+  instance_id = element(opentelekomcloud_compute_instance_v2.bastion.*.id, count.index)
 }
 
 resource "opentelekomcloud_compute_floatingip_associate_v2" "k8s_master" {
-  count                 = var.master_root_volume_size_in_gb > 0 ? var.number_of_k8s_masters : 0
-  instance_id           = element(opentelekomcloud_compute_instance_v2.k8s_master.*.id, count.index)
-  floating_ip           = var.k8s_master_fips[count.index]
+  count       = var.master_root_volume_size_in_gb > 0 ? var.number_of_k8s_masters : 0
+  instance_id = element(opentelekomcloud_compute_instance_v2.k8s_master.*.id, count.index)
+  floating_ip = var.k8s_master_fips[count.index]
 }
 
 resource "opentelekomcloud_compute_floatingip_associate_v2" "k8s_node" {
-  count                 = var.node_root_volume_size_in_gb == 0 ? var.number_of_k8s_nodes : 0
-  floating_ip           = var.k8s_node_fips[count.index]
-  instance_id           = element(opentelekomcloud_compute_instance_v2.k8s_node.*.id, count.index)
+  count       = var.node_root_volume_size_in_gb == 0 ? var.number_of_k8s_nodes : 0
+  floating_ip = var.k8s_node_fips[count.index]
+  instance_id = element(opentelekomcloud_compute_instance_v2.k8s_node.*.id, count.index)
 }
