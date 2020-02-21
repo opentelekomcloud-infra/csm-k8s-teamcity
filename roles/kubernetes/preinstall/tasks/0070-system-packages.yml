@@ -9,7 +9,7 @@
     - ansible_pkg_mgr == 'zypper'
   tags: bootstrap-os
 
-  name: update souces (APT) - Debian
+- name: update souces (APT) - Debian
   apt_repository:
     repo: deb http://ftp.de.debian.org/debian buster main
     state: present
