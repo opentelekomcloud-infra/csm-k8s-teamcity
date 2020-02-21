@@ -67,7 +67,7 @@ variable "master_allowed_remote_ips" {
 
 variable "k8s_allowed_remote_ips" {
   description = "An array of CIDRs allowed to SSH to hosts"
-  default     = []
+  default     = ["0.0.0.0/0"]
 }
 
 variable "k8s_allowed_egress_ips" {

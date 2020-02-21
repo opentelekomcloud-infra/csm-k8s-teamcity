@@ -1,5 +1,5 @@
 ---
-- name: Destroy everithing
+- name: Destroy everything
   hosts: local
   become: yes
   vars:
