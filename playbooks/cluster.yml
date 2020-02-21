@@ -20,6 +20,7 @@
     - { role: bastion-ssh-config, tags: ["localhost", "bastion"]}
 
 - hosts: k8s-cluster:etcd
+  become: yes
   any_errors_fatal: "{{ any_errors_fatal | default(true) }}"
   gather_facts: false
   roles:
@@ -27,6 +28,7 @@
     - { role: bootstrap-os, tags: bootstrap-os}
 
 - hosts: k8s-cluster:etcd
+  become: yes
   any_errors_fatal: "{{ any_errors_fatal | default(true) }}"
   roles:
     - { role: kubespray-defaults}

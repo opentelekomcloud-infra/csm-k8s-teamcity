@@ -9,6 +9,12 @@
     - ansible_pkg_mgr == 'zypper'
   tags: bootstrap-os
 
+  name: update souces (APT) - Debian
+  apt_repository:
+    repo: deb http://ftp.de.debian.org/debian buster main
+    state: present
+  when: ansible_os_family == "Debian"
+
 - name: Update package management cache (APT)
   apt:
     update_cache: yes
