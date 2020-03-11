@@ -1,0 +1,21 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: teamcity
+spec:
+  selector:
+    matchLabels:
+      app: teamcity
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: teamcity
+    spec:
+      containers:
+      - name: teamcity
+        image: jetbrains/teamcity-server
+        ports:
+          - name: teamcity
+            containerPort: 30001

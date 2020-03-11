@@ -1,0 +1,22 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: teamcity-agent
+spec:
+  selector:
+    matchLabels:
+      app: teamcity-agent
+  replicas: 2
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: teamcity-agent
+    spec:
+       containers:
+       - name: teamcityagent
+         image: jetbrains/teamcity-agent
+         env:
+           - name: TEAMCITY_SERVER
+             value: http://teamcity:30001

@@ -45,16 +45,16 @@ variable "k8s_node_fips" {}
 variable "k8s_master_fips" {}
 
 variable "bastion_root_volume_size_in_gb" {
-  default = 5
+  default = 10
 }
 variable "master_root_volume_size_in_gb" {
-  default = 5
+  default = 10
 }
 variable "node_root_volume_size_in_gb" {
-  default = 5
+  default = 10
 }
 variable "etcd_root_volume_size_in_gb" {
-  default = 5
+  default = 10
 }
 variable "ssh_user" {
   default = "linux"

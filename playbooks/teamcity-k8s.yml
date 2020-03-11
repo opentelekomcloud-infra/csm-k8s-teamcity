@@ -1,0 +1,27 @@
+---
+- name: Prepare host
+  hosts: kube-master
+  become: yes
+  tasks:
+    - name: Retrieve kubectl config file from the master server.
+      fetch:
+        src: /root/.kube/config
+        dest: files/kubectl-config
+        flat: yes
+
+    - name: TeamCity deployment definition
+      copy:
+        src: files/teamcity
+        dest: "{{ tmp_dir }}"
+
+    - name: Apply TeamCity Server definition.
+      command: "kubectl apply -f {{ tmp_dir }}/teamcity/teamcity-server.yml"
+      register: teamcity_server_pod
+
+    - name: Apply TeamCity service definition.
+      command: "kubectl apply -f {{ tmp_dir }}/teamcity/teamcity-service.yml"
+      register: teamcity_server_pod
+
+    - name: Apply TeamCity Agent definition.
+      command: "kubectl apply -f {{ tmp_dir }}/teamcity/teamcity-agent.yml"
+      register: teamcity_server_pod
