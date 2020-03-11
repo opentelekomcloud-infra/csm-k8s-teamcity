@@ -44,31 +44,31 @@ module "compute" {
   number_of_k8s_nodes_no_floating_ip = var.number_of_k8s_nodes_no_floating_ip
 }
 
-//module "postgresql" {
-//  source = "./modules/postgresql"
-//
-//  availability_zone = var.availability_zone
-//  instance_name     = "psql_db"
-//
-//  network_id  = module.network.vpc_id
-//  subnet_id   = module.network.subnet.id
-//  subnet_cidr = module.network.subnet.cidr
-//
-//  psql_version  = var.psql_version
-//  psql_port     = var.psql_port
-//  psql_password = var.psql_password
-//}
+module "postgresql" {
+  source = "./modules/postgresql"
 
-//output "out-db_password" {
-//  value     = module.postgresql.db_password
-//  sensitive = true
-//}
-//output "out-db_username" {
-//  value = module.postgresql.db_username
-//}
-//output "out-db_address" {
-//  value = module.postgresql.db_address
-//}
+  availability_zone = var.availability_zone
+  instance_name     = "team_city_psql_db"
+
+  network_id  = module.network.router_id
+  subnet_id   = module.network.network_id
+  subnet_cidr = "${var.addr_3_octets}.0/24"
+
+  psql_version  = var.psql_version
+  psql_port     = var.psql_port
+  psql_password = var.psql_password
+}
+
+output "db_password" {
+  value     = module.postgresql.db_password
+  sensitive = true
+}
+output "db_username" {
+  value = module.postgresql.db_username
+}
+output "db_address" {
+  value = module.postgresql.db_address
+}
 
 output "private_subnet_id" {
   value = module.network.subnet_id
