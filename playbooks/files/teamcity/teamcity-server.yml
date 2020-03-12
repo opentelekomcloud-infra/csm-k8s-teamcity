@@ -18,4 +18,4 @@ spec:
         image: jetbrains/teamcity-server
         ports:
           - name: teamcity
-            containerPort: 30001
+            containerPort: 8111

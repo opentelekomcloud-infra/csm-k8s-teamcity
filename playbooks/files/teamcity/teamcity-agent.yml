@@ -19,4 +19,4 @@ spec:
          image: jetbrains/teamcity-agent
          env:
            - name: TEAMCITY_SERVER
-             value: http://teamcity:30001
+             value: http://teamcity:8111
