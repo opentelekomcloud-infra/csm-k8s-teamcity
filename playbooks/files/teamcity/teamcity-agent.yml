@@ -6,7 +6,7 @@ spec:
   selector:
     matchLabels:
       app: teamcity-agent
-  replicas: 2
+  replicas: 1
   strategy:
     type: Recreate
   template:
@@ -18,5 +18,5 @@ spec:
        - name: teamcityagent
          image: jetbrains/teamcity-agent
          env:
-           - name: TEAMCITY_SERVER
-             value: http://teamcity:8111
+           - name: SERVER_URL
+             value: http://{{ bastion_fips[0] }}:31600

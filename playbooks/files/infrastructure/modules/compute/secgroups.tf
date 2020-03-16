@@ -33,6 +33,24 @@ resource "opentelekomcloud_networking_secgroup_rule_v2" "bastion" {
   security_group_id = opentelekomcloud_networking_secgroup_v2.bastion[0].id
 }
 
+resource "opentelekomcloud_networking_secgroup_v2" "web" {
+  name                 = "${var.cluster_name}-web"
+  count                = var.number_of_bastions != "" ? 1 : 0
+  description          = "${var.cluster_name} - Web Server"
+  delete_default_rules = true
+}
+
+resource "opentelekomcloud_networking_secgroup_rule_v2" "web" {
+  count             = var.number_of_bastions != "" ? length(var.bastion_allowed_remote_ips) : 0
+  direction         = "ingress"
+  ethertype         = "IPv4"
+  protocol          = "tcp"
+  port_range_min    = "80"
+  port_range_max    = "80"
+  remote_ip_prefix  = var.bastion_allowed_remote_ips[count.index]
+  security_group_id = opentelekomcloud_networking_secgroup_v2.web[0].id
+}
+
 resource "opentelekomcloud_networking_secgroup_v2" "k8s" {
   name                 = "${var.cluster_name}-kuber"
   description          = "${var.cluster_name} - Kubernetes"

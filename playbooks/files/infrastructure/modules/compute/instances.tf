@@ -33,6 +33,7 @@ resource "opentelekomcloud_compute_instance_v2" "bastion" {
   security_groups = [
     opentelekomcloud_networking_secgroup_v2.k8s.name,
     element(opentelekomcloud_networking_secgroup_v2.bastion.*.name, count.index),
+    element(opentelekomcloud_networking_secgroup_v2.web.*.name, count.index),
   ]
 
   metadata = {

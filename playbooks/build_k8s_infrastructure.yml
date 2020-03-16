@@ -63,3 +63,8 @@
     copy:
       src: "{{ tmp_dir }}/{{ infrastructure_dir }}/terraform.tfstate"
       dest: "{{ home_dir }}/playbooks/files"
+
+  - name: Update inventory from statefile
+    script: "{{ home_dir }}/playbooks/files/terraform.py"
+    args:
+      executable: 'python3'
