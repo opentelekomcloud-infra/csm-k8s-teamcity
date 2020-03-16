@@ -27,4 +27,6 @@ all:
         node2:
     no-floating:
       hosts:
-        k8s-cluster:
+        master1:
+        node1:
+        node2:
