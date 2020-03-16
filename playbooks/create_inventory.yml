@@ -4,6 +4,6 @@
   become: yes
   tasks:
   - name: Run inventory script
-    script: "{{ home_dir }}/playbooks/files/terraform.py"
+    script: "terraform.py --root {{ home_dir }}"
     args:
       executable: 'python3'
