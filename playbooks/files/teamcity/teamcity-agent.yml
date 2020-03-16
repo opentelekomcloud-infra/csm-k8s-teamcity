@@ -2,6 +2,7 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: teamcity-agent
+  namespace: default
 spec:
   selector:
     matchLabels:
@@ -19,4 +20,4 @@ spec:
          image: jetbrains/teamcity-agent
          env:
            - name: SERVER_URL
-             value: http://{{ bastion_fips[0] }}:31600
+             value: "http://{{ bastion_fips[0] }}"

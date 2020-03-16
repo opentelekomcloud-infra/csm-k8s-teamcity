@@ -1,6 +1,7 @@
 ---
 - name: Prepare user
   hosts: kube-master
+  become: yes
   tasks:
     - name: prepare cluster config
       shell: |
@@ -8,38 +9,44 @@
         sudo chown $(id -u):$(id -g) $HOME/admin.conf
         export KUBECONFIG=$HOME/admin.conf
 
+    - name: Install required packages
+      apt:
+        name:
+          - python3-setuptools
+          - python3-pip
+          - build-essential
+          - python3-dev
+
+    - name: Install openshift
+      pip:
+        name: openshift
+
 - name: Prepare pods
   hosts: kube-master
   become: yes
   tasks:
-    - name: Retrieve kubectl config file from the master server.
-      fetch:
-        src: /root/.kube/config
-        dest: files/kubectl-config
-        flat: yes
-
-    - name: TeamCity deployment definition
-      copy:
-        src: files/teamcity
-        dest: "{{ tmp_dir }}"
-
     - name: Apply TeamCity Server definition.
-      command: "kubectl apply -f {{ tmp_dir }}/teamcity/teamcity-server.yml"
-      register: teamcity_server_pod
+      k8s:
+        state: present
+        definition: "{{ lookup('template', 'files/teamcity/teamcity-server.yml') }}"
 
     - name: Apply TeamCity service definition.
-      command: "kubectl apply -f {{ tmp_dir }}/teamcity/teamcity-service.yml"
-      register: teamcity_server_pod
+      k8s:
+        state: present
+        definition: "{{ lookup('template', 'files/teamcity/teamcity-service.yml') }}"
 
     - name: Apply TeamCity Agent definition.
-      command: "kubectl apply -f {{ tmp_dir }}/teamcity/teamcity-agent.yml"
-      register: teamcity_server_pod
+      k8s:
+        state: present
+        definition: "{{ lookup('template', 'files/teamcity/teamcity-agent.yml') }}"
 
 - name: Install nginx reverse proxy to Bastion
   hosts: bastion
   become: yes
   vars:
     nodename: "{{ groups['nodes'][0] }}"
+    psql_addr: "{{ db_address.split(':')[0] }}"
+    psql_port: "{{ db_address.split(':')[1] }}"
   tasks:
     - name: Install required packages
       apt:
@@ -56,10 +63,10 @@
 
     - name: Create a new database with name "teamcity"
       postgresql_db:
-        login_user: db_username
-        login_host: db_address.split(":")[0]
-        login_password: db_password
-        port: db_address.split(":")[1]
+        login_user: "{{ db_username }}"
+        login_host: "{{ psql_addr }}"
+        login_password: "{{ db_password }}"
+        port: "{{ psql_port }}"
         name: teamcity
   roles:
     - role: geerlingguy.nginx
