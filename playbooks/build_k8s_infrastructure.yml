@@ -65,6 +65,6 @@
       dest: "{{ home_dir }}/playbooks/files"
 
   - name: Update inventory from statefile
-    script: "{{ home_dir }}/playbooks/files/terraform.py"
+    script: "terraform.py --root {{ home_dir }}"
     args:
       executable: 'python3'
