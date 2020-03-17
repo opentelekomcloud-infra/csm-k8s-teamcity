@@ -21,3 +21,7 @@ spec:
          env:
            - name: SERVER_URL
              value: "http://{{ bastion_fips[0] }}"
+           - name: DOCKER_IN_DOCKER
+             value: start
+         securityContext:
+           privileged: true
