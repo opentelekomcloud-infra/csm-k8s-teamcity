@@ -40,7 +40,7 @@
         state: present
         definition: "{{ lookup('template', 'files/teamcity/teamcity-agent.yml') }}"
 
-- name: Install nginx reverse proxy to Bastion
+- name: Configure Bastion
   hosts: bastion
   become: yes
   vars:
@@ -56,6 +56,7 @@
           - libpq-dev
           - build-essential
           - python3-dev
+          - cron
 
     - name: Install psycopg2
       pip:
@@ -68,18 +69,28 @@
         login_password: "{{ db_password }}"
         port: "{{ psql_port }}"
         name: teamcity
+
+- name: Install nginx reverse proxy to Bastion
+  hosts: bastion
+  become: yes
+  vars_files:
+  - "./vars/nginx_parameters.yml"
   roles:
+    - role: geerlingguy.certbot
+      vars:
+        certbot_admin_email: "teamcity@{{ domain }}"
+        certbot_create_if_missing: true
+        certbot_create_standalone_stop_services: []
+        certbot_auto_renew_user: linux
+        certbot_auto_renew_minute: "20"
+        certbot_auto_renew_hour: "5"
+        certbot_certs:
+          - domains:
+              - "{{ domain }}"
     - role: geerlingguy.nginx
       vars:
         nginx_remove_default_vhost: yes
         nginx_vhosts:
-          - listen: "80"
-            server_name: "localhost"
-            extra_parameters: |
-              location / {
-                  proxy_pass http://{{ hostvars.node1.ansible_host }}:31600;
-                  proxy_set_header Host $host;
-                  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                  proxy_set_header X-Real-IP $remote_addr;
-                  proxy_http_version 1.1;
-              }
+          - listen: "443 ssl"
+            server_name: "{{ domain }}"
+            extra_parameters: "{{ extra_parameters }}"
