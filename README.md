@@ -15,20 +15,20 @@ Existing scripts were checked to be working with:
 
 ### Build
 Review and change parameters under ``inventory/prod/group_vars``
-cat inventory/mycluster/group_vars/all/all.yml
-cat inventory/mycluster/group_vars/k8s-cluster/k8s-cluster.yml
+- cat inventory/mycluster/group_vars/all/all.yml
+- cat inventory/mycluster/group_vars/k8s-cluster/k8s-cluster.yml
 
 Also need to change cluster parameters``playbooks/files/infrastructure/terraform.tfvars``
 
-Infrastructure build can be triggered using `ansible-playbook -i inventory/prod/ playbooks/build_k8s_infrastructure.yml`
+- Infrastructure build can be triggered using `ansible-playbook -i inventory/prod/ playbooks/build_k8s_infrastructure.yml`.
 This playbook installs all required roles, packages and prepares inventory files.
 
-Then deploy kubernetes with Ansible Playbook `ansible-playbook -i inventory/prod/ playbooks/cluster.yml`
+- Then deploy kubernetes with Ansible Playbook `ansible-playbook -i inventory/prod/ playbooks/cluster.yml`.
 
 **!NB** Terraform is using OBS for storing remote state
 Following variables have to be set: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`
 
-Also terrafor using next variables for build:
+Also terraform using next variables for build:
 ```
 export AWS_ACCESS_KEY_ID=my_key
 export AWS_SECRET_ACCESS_KEY=my_secret
