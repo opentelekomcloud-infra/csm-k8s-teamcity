@@ -34,6 +34,11 @@
       k8s:
         state: present
         definition: "{{ lookup('template', 'files/teamcity/teamcity-service.yml') }}"
+      register: k8s_service
+
+    - name: Get k8s service port from output
+      set_fact:
+        teamcity_port: "{{ k8s_service.result.spec.ports[0].nodePort }}"
 
     - name: Apply TeamCity Agent definition.
       k8s:
@@ -90,6 +95,11 @@
     - role: geerlingguy.nginx
       vars:
         nginx_remove_default_vhost: yes
+        nginx_upstreams:
+          - name: teamcity
+            servers:
+              - "{{ hostvars.node1.ansible_host }}:{{ hostvars.master1.teamcity_port }}"
+              - "{{ hostvars.node2.ansible_host }}:{{ hostvars.master1.teamcity_port }}"
         nginx_vhosts:
           - listen: "443 ssl"
             server_name: "{{ domain }}"

@@ -20,7 +20,7 @@ spec:
          image: jetbrains/teamcity-agent
          env:
            - name: SERVER_URL
-             value: "http://{{ bastion_fips[0] }}"
+             value: https://teamcity.outcatcher.com
            - name: DOCKER_IN_DOCKER
              value: start
          securityContext:
