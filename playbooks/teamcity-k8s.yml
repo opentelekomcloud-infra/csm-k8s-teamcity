@@ -25,6 +25,16 @@
   hosts: kube-master
   become: yes
   tasks:
+    - name: Apply TeamCity Storage definition.
+      k8s:
+        state: present
+        definition: "{{ lookup('template', 'files/teamcity/teamcity-storage.yml') }}"
+
+    - name: Apply TeamCity Storage Claim definition.
+      k8s:
+        state: present
+        definition: "{{ lookup('template', 'files/teamcity/teamcity-storage_claim.yml') }}"
+
     - name: Apply TeamCity Server definition.
       k8s:
         state: present
